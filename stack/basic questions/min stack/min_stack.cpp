@@ -1,95 +1,53 @@
-#include <stack>
-#include <iostream>
-using namespace std;
 
-class MinStack {
+class MinStack 
+{
+    stack<long long> st;
+    long long mini;
 public:
-    stack<int> s;
-    int minimum;
-
-    MinStack() 
-    {
-        while (!s.empty()) s.pop(); // Ensure stack is empty initially
+    /** initialize your data structure here. */
+    MinStack() {
+        // Ensuring the stack is empty and initializing mini
+        while (!st.empty()) st.pop();
+        mini = LLONG_MAX; // Using LLONG_MAX for consistency with long long type
     }
-    
-    void push(int currentVal) 
-    {
-        if (s.empty()) 
-        {
-            minimum = currentVal;
-            s.push(currentVal);
-        } 
-        else 
-        {
-            if (currentVal >= minimum) 
-            {
-                s.push(currentVal);
-            } 
-            else 
-            {
-                // Push modified value to keep track of the minimum
-                s.push(2 * currentVal - minimum);
-                minimum = currentVal;
+
+    void push(int value) {
+        long long val = static_cast<long long>(value);
+        if (st.empty()) {
+            mini = val;
+            st.push(val);
+        } else {
+            if (val < mini) {
+                // Pushing the encoded value
+                st.push(2 * val - mini);
+                mini = val;
+            } else {
+                st.push(val);
             }
         }
     }
-    
-    void pop() 
-    {
-        if (s.empty()) return;
 
-        int topVal = s.top();
-        s.pop();
+    void pop() {
+        if (st.empty()) return;
 
-        if (topVal < minimum) 
-        {
-            minimum = 2 * minimum - topVal; // Restore previous minimum
+        long long el = st.top();
+        st.pop();
+
+        if (el < mini) {
+            // Updating mini to the previous minimum value
+            mini = 2 * mini - el;
         }
     }
-    
-    int top() 
-    {
-        if (s.empty()) return -1; // Return an invalid value or throw an exception
 
-        int topVal = s.top();
-        if (topVal < minimum) 
-        {
-            return minimum; // Return the current minimum if topVal is modified
-        } 
-        else 
-        {
-            return topVal;
-        }
+    int top() {
+        if (st.empty()) return -1;
+
+        long long el = st.top();
+        if (el < mini) return static_cast<int>(mini);
+        return static_cast<int>(el);
     }
-    
-    int getMin() 
-    {
-        if (s.empty()) return -1; // Return an invalid value or throw an exception
-        return minimum;
+
+    int getMin() {
+        return static_cast<int>(mini);
     }
 };
-
-/**
- * Your MinStack object will be instantiated and called as such:
- * MinStack* obj = new MinStack();
- * obj->push(val);
- * obj->pop();
- * int param_3 = obj->top();
- * int param_4 = obj->getMin();
- */
-
-int main() {
-    MinStack* obj = new MinStack();
-    obj->push(5);
-    obj->push(3);
-    obj->push(7);
-    cout << "Top element: " << obj->top() << endl; // Output: 7
-    cout << "Minimum element: " << obj->getMin() << endl; // Output: 3
-    obj->pop();
-    cout << "Top element after pop: " << obj->top() << endl; // Output: 3
-    cout << "Minimum element after pop: " << obj->getMin() << endl; // Output: 3
-    obj->pop();
-    cout << "Top element after another pop: " << obj->top() << endl; // Output: 5
-    cout << "Minimum element after another pop: " << obj->getMin() << endl; // Output: 5
-    return 0;
-}
